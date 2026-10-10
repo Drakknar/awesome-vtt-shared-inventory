@@ -1,0 +1,54 @@
+/* ============================================================
+   Awesome VTT – Shared Inventory
+   Drawn inside a table seat panel (.avtsi-table) or the phone's Party view (.avtsi-phone); colours come from the
+   host where it sets them (--seat-color on the table), with neutral fallbacks.
+   ============================================================ */
+
+.avtsi-panel { --avtsi-accent: var(--seat-color, #c9a227); --avtsi-ink: var(--seat-ink, #111); --avtsi-border: rgba(255, 255, 255, 0.18); }
+.avtsi-body { display: flex; flex-direction: column; gap: 0.6em; min-height: 0; }
+.avtsi-panel.avtsi-drop-target { outline: 2px dashed var(--avtsi-accent); outline-offset: -4px; }
+.avtsi-muted { color: #a8a8b3; font-size: 0.9em; margin: 0; }
+.avtsi-warning { color: #f85149; font-size: 0.9em; margin: 0; }
+.avtsi-header { display: flex; gap: 0.5em; align-items: center; }
+.avtsi-header img { width: 2.2em; height: 2.2em; border: none; border-radius: 50%; object-fit: cover; }
+.avtsi-group h4 {
+  margin: 0 0 0.35em; padding-bottom: 0.15em;
+  border-bottom: 1px solid var(--avtsi-border);
+  font-size: 0.95em; color: var(--avtsi-accent);
+}
+.avtsi-row { display: flex; gap: 0.3em; align-items: center; }
+.avtsi-row input { flex: 1; min-width: 0; }
+.avtsi-row input.avtsi-qty-input { flex: 0 0 4em; }
+.avtsi-panel button { width: auto; }
+.avtsi-panel button.active { background: var(--avtsi-accent); border-color: var(--avtsi-accent); color: var(--avtsi-ink); }
+
+/* Coins */
+.avtsi-coins { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25em; }
+.avtsi-coin { display: flex; flex-direction: column; align-items: center; gap: 0.1em; font-size: 0.85em; }
+.avtsi-coin img { width: 1.4em; height: 1.4em; border: none; }
+.avtsi-coin input { width: 100%; text-align: center; box-sizing: border-box; }
+.avtsi-transfer { display: flex; flex-direction: column; gap: 0.35em; margin-top: 0.5em; }
+.avtsi-coin-choice { display: flex; gap: 0.2em; }
+.avtsi-coin-choice button { flex: 1; }
+
+/* Items */
+.avtsi-items, .avtsi-results { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.2em; }
+.avtsi-contents { margin: 0.2em 0 0 1.2em; }
+.avtsi-item-row { display: flex; gap: 0.2em; align-items: center; }
+.avtsi-item-name, .avtsi-results button { flex: 1; min-width: 0; width: 100%; display: flex; gap: 0.5em; align-items: center; text-align: left; }
+.avtsi-item-name img, .avtsi-results img { width: 1.8em; height: 1.8em; border: none; flex: none; }
+.avtsi-item-name span, .avtsi-results span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.avtsi-results em { color: #a8a8b3; font-size: 0.85em; }
+.avtsi-qty { display: inline-flex; align-items: center; gap: 0.15em; flex: none; }
+.avtsi-qty > span { min-width: 1.8em; text-align: center; }
+.avtsi-details { margin: 0.2em 0 0.3em; padding: 0.4em; font-size: 0.85em; background: rgba(0, 0, 0, 0.3); border-radius: 0.4em; }
+.avtsi-details img { max-width: 100%; }
+.avtsi-results button[draggable="true"] { cursor: grab; }
+
+/* Window (normal Foundry UI, GM). */
+.avtsi-window .window-content { overflow-y: auto; }
+
+/* Phone: touch-sized controls. */
+.avtsi-phone button, .avtsi-phone input { min-height: 44px; }
+.avtsi-phone .avtsi-qty button { min-width: 44px; }
+.avtsi-phone .avtsi-body { padding-bottom: 1em; }

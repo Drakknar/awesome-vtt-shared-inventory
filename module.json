@@ -1,0 +1,58 @@
+{
+  "id": "awesome-vtt-shared-inventory",
+  "title": "Awesome VTT – Shared Inventory",
+  "description": "A shared party inventory for Awesome VTT (table mode) and its Phone Companion: coins and items kept on a party actor (dnd5e's primary party, or a Party actor the GM creates or chooses in Shadow of the Demon Lord), added by typing, searching compendiums or dragging items in. Shown as a Party section in those modules.",
+  "version": "0.2.0",
+  "authors": [
+    {
+      "name": "Stefano Pignataro"
+    }
+  ],
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "6.0.0",
+          "verified": "6.0.5"
+        }
+      },
+      {
+        "id": "demonlord",
+        "type": "system",
+        "compatibility": {
+          "minimum": "6.1.0",
+          "verified": "6.1.11"
+        }
+      }
+    ],
+    "requires": [
+      {
+        "id": "awesome-vtt-core",
+        "type": "module",
+        "reason": "Shared code (system adapters, item descriptions, UI helpers).",
+        "compatibility": {
+          "minimum": "0.12.0"
+        }
+      }
+    ]
+  },
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "styles": [
+    "styles/shared-inventory.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{{!-- The party's shared inventory (shared-inventory module), drawn inside a table seat panel or the phone's Party view. --}}
+<div class="avtsi-body">
+{{#if party}}
+  <header class="avtsi-header">
+    {{#if party.img}}<img src="{{party.img}}" alt="">{{/if}}
+    <strong>{{party.name}}</strong>
+  </header>
+  {{#unless canEdit}}
+  <p class="avtsi-warning">{{localize "AVTTSI.ReadOnly"}}</p>
+  {{#if isGM}}<button type="button" data-avtsi-action="share">{{localize "AVTTSI.Share"}}</button>{{/if}}
+  {{/unless}}
+
+  <section class="avtsi-group">
+    <h4>{{localize "AVTTSI.Coins"}}</h4>
+    <div class="avtsi-coins">
+      {{#each currency}}
+      <label class="avtsi-coin">
+        {{#if icon}}<img src="{{icon}}" alt="">{{/if}}
+        <input type="number" name="avtsiCurrency.{{key}}" value="{{value}}" min="0" max="9999999" step="1" inputmode="numeric"
+               aria-label="{{label}}" {{#unless @root.canEdit}}disabled{{/unless}}>
+        <span>{{abbr}}</span>
+      </label>
+      {{/each}}
+    </div>
+    {{#if actor}}{{#if canEdit}}
+    {{!-- Move coins between the character shown and the party. --}}
+    <div class="avtsi-transfer">
+      <div class="avtsi-coin-choice" role="radiogroup" aria-label="{{localize 'AVTTSI.Coin'}}">
+        {{#each currency}}
+        <button type="button" data-avtsi-action="coin" data-coin="{{key}}" role="radio" class="{{#if selected}}active{{/if}}"
+                aria-checked="{{#if selected}}true{{else}}false{{/if}}">{{abbr}}</button>
+        {{/each}}
+      </div>
+      <div class="avtsi-row">
+        <input type="number" name="avtsiAmount" value="{{amount}}" min="0" max="9999999" step="1" inputmode="numeric" placeholder="0"
+               aria-label="{{localize 'AVTTSI.Amount'}}">
+        <button type="button" data-avtsi-action="deposit"><i class="fa-solid fa-arrow-right-to-bracket" inert></i> {{localize "AVTTSI.Deposit"}}</button>
+        <button type="button" data-avtsi-action="withdraw"><i class="fa-solid fa-arrow-right-from-bracket" inert></i> {{localize "AVTTSI.Withdraw"}}</button>
+      </div>
+      <p class="avtsi-muted">{{localize "AVTTSI.YouHave" name=actor.name}} {{#each currency}}{{mine}} {{abbr}}{{#unless @last}} · {{/unless}}{{/each}}</p>
+    </div>
+    {{/if}}{{/if}}
+  </section>
+
+  <section class="avtsi-group">
+    <h4>{{localize "AVTTSI.Items"}}</h4>
+    <ul class="avtsi-items">
+      {{#each items}}{{> avtsiItem}}{{else}}
+      <li class="avtsi-muted">{{localize "AVTTSI.Empty"}}</li>
+      {{/each}}
+    </ul>
+    {{#if canDrag}}{{#if canEdit}}<p class="avtsi-muted avtsi-drop-hint"><i class="fa-solid fa-hand-pointer" inert></i> {{localize "AVTTSI.DropHint"}}</p>{{/if}}{{/if}}
+  </section>
+
+  {{#if canEdit}}
+  <section class="avtsi-group">
+    <h4>{{localize "AVTTSI.Add"}}</h4>
+    <div class="avtsi-row">
+      <input type="text" name="avtsiName" value="{{name}}" maxlength="80" autocomplete="off" placeholder="{{localize 'AVTTSI.NamePlaceholder'}}"
+             aria-label="{{localize 'AVTTSI.NamePlaceholder'}}">
+      <input type="number" name="avtsiQty" value="{{quantity}}" min="1" max="9999" step="1" inputmode="numeric" class="avtsi-qty-input"
+             aria-label="{{localize 'AVTTSI.Quantity'}}">
+      <button type="button" data-avtsi-action="addName" data-tooltip="" aria-label="{{localize 'AVTTSI.AddTyped'}}"><i class="fa-solid fa-plus" inert></i></button>
+    </div>
+    <div class="avtsi-row" role="search">
+      <input type="search" name="avtsiQuery" value="{{query}}" maxlength="64" autocomplete="off" placeholder="{{localize 'AVTTSI.SearchPlaceholder'}}"
+             aria-label="{{localize 'AVTTSI.SearchPlaceholder'}}">
+      {{#if query}}<button type="button" data-avtsi-action="clearSearch" data-tooltip="" aria-label="{{localize 'AVTTSI.ClearSearch'}}"><i class="fa-solid fa-xmark" inert></i></button>{{/if}}
+    </div>
+    {{#if results}}
+    <ul class="avtsi-results">
+      {{#each results}}
+      <li>
+        <button type="button" data-avtsi-action="addUuid" data-uuid="{{uuid}}" {{#if @root.canDrag}}draggable="true"{{/if}}
+                aria-label="{{localize 'AVTTSI.AddNamed' name=name}}">
+          {{#if img}}<img src="{{img}}" alt="">{{/if}}<span>{{name}}</span><em>{{pack}}</em><i class="fa-solid fa-plus" inert></i>
+        </button>
+      </li>
+      {{else}}
+      <li class="avtsi-muted">{{localize "AVTTSI.NoResults"}}</li>
+      {{/each}}
+    </ul>
+    {{/if}}
+  </section>
+  {{/if}}
+{{else if hidden}}
+  <p class="avtsi-warning">{{localize "AVTTSI.NoAccess"}}</p>
+{{else}}
+  <p class="avtsi-muted">{{#if (eq system "dnd5e")}}{{localize "AVTTSI.NoParty"}}{{else}}{{localize "AVTTSI.NoPartyActor"}}{{/if}}</p>
+  {{#if isGM}}<button type="button" data-avtsi-action="create"><i class="fa-solid fa-people-group" inert></i> {{localize "AVTTSI.Create"}}</button>
+  {{#if choices.length}}
+  {{!-- SotDL: use an existing actor as the party. --}}
+  <div class="avtsi-row">
+    <select name="avtsiPartyChoice" aria-label="{{localize 'AVTTSI.ChooseLabel'}}">
+      {{#each choices}}<option value="{{id}}">{{name}}</option>{{/each}}
+    </select>
+    <button type="button" data-avtsi-action="choose">{{localize "AVTTSI.Choose"}}</button>
+  </div>
+  {{/if}}{{/if}}
+{{/if}}
+</div>
