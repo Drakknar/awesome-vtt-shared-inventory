@@ -2,10 +2,10 @@
   "id": "awesome-vtt-shared-inventory",
   "title": "Awesome VTT – Shared Inventory",
   "description": "A shared party inventory for Awesome VTT (table mode) and its Phone Companion: coins and items kept on a party actor (dnd5e's primary party, or a Party actor the GM creates or chooses in Shadow of the Demon Lord), added by typing, searching compendiums or dragging items in. Shown as a Party section in those modules.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "url": "https://github.com/Drakknar/awesome-vtt-shared-inventory",
   "manifest": "https://github.com/Drakknar/awesome-vtt-shared-inventory/releases/latest/download/module.json",
-  "download": "https://github.com/Drakknar/awesome-vtt-shared-inventory/releases/download/v0.2.0/module.zip",
+  "download": "https://github.com/Drakknar/awesome-vtt-shared-inventory/releases/download/v0.2.1/module.zip",
   "authors": [
     {
       "name": "Stefano Pignataro"
@@ -38,6 +38,7 @@
       {
         "id": "awesome-vtt-core",
         "type": "module",
+        "manifest": "https://github.com/Drakknar/awesome-vtt-core/releases/latest/download/module.json",
         "reason": "Shared code (system adapters, item descriptions, UI helpers).",
         "compatibility": {
           "minimum": "0.12.0"
