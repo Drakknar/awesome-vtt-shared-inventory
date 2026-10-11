@@ -12,3 +12,16 @@ Optional module, by Stefano Pignataro: the party's shared inventory (coins and i
 - **Actors sidebar menu (2026-10-10):** the GM can't reach the Party panel from the normal Foundry UI (only table / phone draw it), so `addActorContextOptions` (hook `getActorContextOptions`, registered at init) adds right-click entries: SotDL "use as party" (non-character actors, `chooseParty`) and "stop" (`STORES.demonlord.forget`); both systems "Let all players change it" (`shareParty`) on the party. dnd5e's own "Set as primary party" is not repeated. GM "Open the party's inventory" opens `PartyInventoryWindow` (panel.mjs, ApplicationV2, panel with `device: "window"`, no character, so no coin/item moves); GM rows get an `edit` action (item sheet). SotDL creature sheets hide inventory unless the system setting `demonlord.addCreatureInventoryTab` is on.
 - **Status:** only syntax-checked so far (node --check, template precompile, JSON). Not yet run in a live world.
 - **Checks after edits:** `node --check`, template precompile, JSON validation; keep the README in step.
+
+## Upstream watch
+
+`.github/workflows/compat-review.yml` runs daily and has Claude review this module once for each new version of a dependency, following `.github/prompts/foundry-compat.md`.
+- **Game systems:** a release of a system in `relationships.systems` newer than its `verified` version.
+- **Foundry core:** a new Stable build, with a light review within the verified generation and a full review for a new generation.
+- **Results:**
+  - The module is fine: a pull request that bumps `verified`. It goes out with the next manual release.
+  - A fix: a pull request.
+  - Anything that needs the owner: an issue labelled `upstream-watch` and assigned to the owner.
+  - New features worth using: an `enhancement` issue.
+- **Access:** Claude works with read-only access (secret `CLAUDE_CODE_OAUTH_TOKEN`). A separate job opens the pull request and issues.
+- **Bookkeeping:** `.github/scripts/watch.sh` records what was reviewed on the `watch-state` branch. Run the workflow by hand with `force` to review again.
