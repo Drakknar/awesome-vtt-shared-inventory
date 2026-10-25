@@ -1,12 +1,15 @@
 import { MODULE_ID } from "./constants.mjs";
 import { SharedInventoryPanel, PartyInventoryWindow, watchChanges } from "./panel.mjs";
 import { getParty, canEdit, giveItem, supported, addActorContextOptions } from "./party.mjs";
+import { fixStatusIds } from "../../awesome-vtt-core/scripts/system.mjs";
 
 /**
  * The party's shared inventory, for Awesome VTT (table seats) and its Phone Companion. This module draws nothing on
  * its own: when it is active, those modules add a "Party" section and mount its panel there through this API.
  */
 Hooks.once("init", () => {
+  // Static _ids for SotDL's Blinded / Unconscious, also when the table and phone modules are off (core's fixStatusIds).
+  fixStatusIds();
   // The item row is a named partial ({{> avtsiItem}}), used for container contents too.
   foundry.applications.handlebars.loadTemplates({
     avtsiItem: `modules/${MODULE_ID}/templates/item.hbs`,
