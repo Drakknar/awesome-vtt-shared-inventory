@@ -15,7 +15,7 @@ Hooks.once("init", () => {
     avtsiItem: `modules/${MODULE_ID}/templates/item.hbs`,
     avtsiPanel: `modules/${MODULE_ID}/templates/panel.hbs`
   });
-  // dnd5e: its primary party holds the inventory. SotDL: an actor the GM creates or chooses (its id here).
+  // For dnd5e its primary party holds the inventory; for SotDL an actor the GM creates or chooses (its id here).
   if ( !supported() ) return;
   game.settings.register(MODULE_ID, "partyActor", {
     scope: "world", config: false, type: new foundry.data.fields.StringField({ blank: true, initial: "" })
@@ -30,7 +30,10 @@ Hooks.once("init", () => {
      * @returns {SharedInventoryPanel}  Call its render() when the panel is shown.
      */
     mount: (root, options) => new SharedInventoryPanel(root, options),
-    /** Can this user put things into the party's inventory (a party exists and they own it)? */
+    /**
+     * Can this user put things into the party's inventory (a party exists and they own it)?
+     * @returns {boolean}
+     */
     canGive: () => canEdit(getParty()),
     /** Move one of the character's items (the whole stack) to the party. */
     giveItem
