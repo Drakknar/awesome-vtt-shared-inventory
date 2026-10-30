@@ -47,7 +47,10 @@ export class SharedInventoryPanel {
     panels.add(this);
   }
 
-  /** Is the panel on screen (the host hides closed panels and other views)? */
+  /**
+   * Is the panel on screen (the host hides closed panels and other views)?
+   * @returns {boolean}
+   */
   get visible() {
     return this.root.isConnected && !this.root.closest("[hidden]");
   }
@@ -151,7 +154,10 @@ export class SharedInventoryPanel {
     return this.render();
   });
 
-  /** Search the compendiums (the core's search: null below its minimum length). */
+  /**
+   * Search the compendiums (the core's search: null below its minimum length).
+   * @returns {Promise<void>}
+   */
   async #search() {
     const query = this.state.query;
     const results = await party.searchItems(query);
@@ -165,7 +171,10 @@ export class SharedInventoryPanel {
   /*  Drag and drop                               */
   /* -------------------------------------------- */
 
-  /** Search results can be dragged too (e.g. onto a character sheet). */
+  /**
+   * Search results can be dragged too (e.g. onto a character sheet).
+   * @param {DragEvent} event
+   */
   #onDragStart(event) {
     const el = event.target.closest?.("[data-uuid][draggable]");
     if ( !el ) return;
@@ -185,7 +194,7 @@ export class SharedInventoryPanel {
     event.stopPropagation();
     try {
       await party.addFromDrop(event);
-    } catch(err) {
+    } catch ( err ) {
       console.error(`${MODULE_ID} | Drop failed`, err);
       ui.notifications.error(err.message);
     }
@@ -209,7 +218,10 @@ export class PartyInventoryWindow extends foundry.applications.api.ApplicationV2
   /** @type {SharedInventoryPanel|null} */
   panel = null;
 
-  /** Open the window, or bring it to the front. */
+  /**
+   * Open the window, or bring it to the front.
+   * @returns {Promise<PartyInventoryWindow>}
+   */
   static open() {
     const app = foundry.applications.instances.get(this.DEFAULT_OPTIONS.id) ?? new this();
     return app.render({ force: true });

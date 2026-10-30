@@ -44,24 +44,44 @@ const STORES = {
 
 const store = () => STORES[game.system.id] ?? null;
 
-/** Does this module support the world's system? */
+/**
+ * Does this module support the world's system?
+ * @returns {boolean}
+ */
 export const supported = () => !!store();
 
-/** The setting that names the party (re-draw panels when it changes). */
+/**
+ * The setting that names the party (re-draw panels when it changes).
+ * @returns {string|null}
+ */
 export const partySetting = () => store()?.setting ?? null;
 
-/** The party actor, or null. */
+/**
+ * The party actor, or null.
+ * @returns {Actor|null}
+ */
 export function getParty() {
   return store()?.get() ?? null;
 }
 
-/** Can this user change the party's coins and items? */
+/**
+ * Can this user change the party's coins and items?
+ * @param {Actor|null} party
+ * @returns {boolean}
+ */
 export const canEdit = party => !!party?.isOwner;
 
-/** May this user see the party's contents (at least Observer)? */
+/**
+ * May this user see the party's contents (at least Observer)?
+ * @param {Actor|null} party
+ * @returns {boolean}
+ */
 const canSee = party => !!party?.testUserPermission(game.user, "OBSERVER");
 
-/** The party, if this user may change it. */
+/**
+ * The party, if this user may change it.
+ * @returns {Actor|null}
+ */
 function editableParty() {
   const party = getParty();
   return canEdit(party) ? party : null;
@@ -75,6 +95,7 @@ function editableParty() {
  * Template data for the panel.
  * @param {Actor|null} actor  The character shown (coins and items move between it and the party).
  * @param {object} state      The panel's own state (chosen coin, amounts, search, open descriptions).
+ * @returns {object}
  */
 export function partyContext(actor, state) {
   const party = getParty();
@@ -116,7 +137,10 @@ export function partyContext(actor, state) {
 /*  Party (GM)                                  */
 /* -------------------------------------------- */
 
-/** GM: create a party actor, owned by all players, and make it the party (dnd5e: its primary party). */
+/**
+ * GM: create a party actor, owned by all players, and make it the party (dnd5e: its primary party).
+ * @returns {Promise<Actor|null>} The new party, or null if this user can't create one.
+ */
 export async function createParty() {
   const s = store();
   if ( !game.user.isGM || !s ) return null;
@@ -125,14 +149,21 @@ export async function createParty() {
   return party;
 }
 
-/** GM (SotDL): make an existing actor the party. Players need Owner on it; "Let all players change it" grants that. */
+/**
+ * GM (SotDL): make an existing actor the party. Players need Owner on it; "Let all players change it" grants that.
+ * @param {string} actorId
+ * @returns {Promise<unknown>|null}
+ */
 export function chooseParty(actorId) {
   const actor = game.actors.get(actorId);
   if ( !game.user.isGM || !actor || !store()?.canChoose ) return null;
   return store().remember(actor);
 }
 
-/** GM: let all players change the party's inventory (default permission Owner). */
+/**
+ * GM: let all players change the party's inventory (default permission Owner).
+ * @returns {Promise<Actor>|undefined}
+ */
 export function shareParty() {
   const party = getParty();
   if ( game.user.isGM && party ) return party.update({ "ownership.default": OWNER });
@@ -188,12 +219,25 @@ export function addActorContextOptions(app, options, openWindow) {
 /*  Coins and items                             */
 /* -------------------------------------------- */
 
+/**
+ * Set how many coins of one kind the party has, if this user may change it.
+ * @param {string} key
+ * @param {number|string} value
+ * @returns {Promise<Actor>|undefined}
+ */
 export function setPartyCurrency(key, value) {
   const party = editableParty();
   if ( party ) return sys.setCurrency(party, key, value);
 }
 
-/** Deposit: character → party. Withdraw: party → character. Returns how many coins moved. */
+/**
+ * Deposit: character → party. Withdraw: party → character. Returns how many coins moved.
+ * @param {Actor|null} actor
+ * @param {"deposit"|"withdraw"} direction
+ * @param {string} key
+ * @param {number|string} amount
+ * @returns {number|Promise<number>}
+ */
 export function moveCurrency(actor, direction, key, amount) {
   const party = editableParty();
   if ( !party || !actor ) return 0;
@@ -201,12 +245,22 @@ export function moveCurrency(actor, direction, key, amount) {
   return sys.moveCurrency(from, to, key, amount);
 }
 
+/**
+ * Add an item typed by name to the party: more of a loose loot item with that name, or a new one.
+ * @param {string} name
+ * @param {number|string} quantity
+ * @returns {Promise<Item|undefined>|null}
+ */
 export function addByName(name, quantity) {
   const party = editableParty();
   return party ? sys.addNamedItem(party, name, quantity) : null;
 }
 
-/** Add an item from a compendium or the world (a uuid, e.g. dropped or found by search). Carried items only. */
+/**
+ * Add an item from a compendium or the world (a uuid, e.g. dropped or found by search). Carried items only.
+ * @param {string} uuid
+ * @returns {Promise<void>}
+ */
 export async function addFromUuid(uuid) {
   const party = editableParty();
   if ( !party || (typeof uuid !== "string") ) return;
@@ -218,18 +272,32 @@ export async function addFromUuid(uuid) {
   if ( item.parent !== party ) return sys.copyItems([item], party);
 }
 
-/** Add whatever Item was dropped on the panel (from a compendium window, a sheet, or a search result). */
+/**
+ * Add whatever Item was dropped on the panel (from a compendium window, a sheet, or a search result).
+ * @param {DragEvent} event
+ * @returns {Promise<void>|undefined}
+ */
 export function addFromDrop(event) {
   const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
   if ( (data?.type === "Item") && data.uuid ) return addFromUuid(data.uuid);
 }
 
+/**
+ * Change the quantity of one of the party's items by one, if this user may change the party.
+ * @param {string} itemId
+ * @param {number} delta
+ * @returns {Promise<Item>|undefined}
+ */
 export function changeQuantity(itemId, delta) {
   const party = editableParty();
   if ( party ) return sys.changeQuantity(party, itemId, delta);
 }
 
-/** Remove one of the party's items (and a container's contents), after asking. */
+/**
+ * Remove one of the party's items (and a container's contents), after asking.
+ * @param {string} itemId
+ * @returns {Promise<Item|undefined>}
+ */
 export async function removeItem(itemId) {
   const item = editableParty()?.items.get(itemId);
   if ( !item ) return;
@@ -240,24 +308,46 @@ export async function removeItem(itemId) {
   if ( ok ) return item.delete({ deleteContents: true });
 }
 
-/** GM: open one of the party's items in its sheet, to change anything about it. */
+/**
+ * GM: open one of the party's items in its sheet, to change anything about it.
+ * @param {string} itemId
+ * @returns {Promise<ApplicationV2>|undefined}
+ */
 export function editItem(itemId) {
   const item = game.user.isGM ? getParty()?.items.get(itemId) : null;
   return item?.sheet.render({ force: true });
 }
 
-/** A character gives one of its items (the whole stack) to the party. */
+/**
+ * A character gives one of its items (the whole stack) to the party.
+ * @param {Actor} actor
+ * @param {string} itemId
+ * @returns {Promise<Item|undefined>}
+ */
 export const giveItem = (actor, itemId) => sys.moveItem(actor, editableParty(), itemId);
 
-/** A character takes one of the party's items (the whole stack). */
+/**
+ * A character takes one of the party's items (the whole stack).
+ * @param {Actor} actor
+ * @param {string} itemId
+ * @returns {Promise<Item|undefined>}
+ */
 export const takeItem = (actor, itemId) => sys.moveItem(editableParty(), actor, itemId);
 
-/** An item's description, as a player may see it. */
+/**
+ * An item's description, as a player may see it.
+ * @param {string} itemId
+ * @returns {Promise<string>|string}
+ */
 export function itemDescription(itemId) {
   const party = getParty();
   return party ? sys.getItemDescription(party, itemId) : "";
 }
 
-/** Carried items in visible Item compendiums whose name contains the query (the core's search). */
+/**
+ * Carried items in visible Item compendiums whose name contains the query (the core's search).
+ * @param {string} query
+ * @returns {Promise<object[]|null>} Index entries ({uuid, name, img, pack}); null below the minimum length.
+ */
 export const searchItems = query =>
   search(query, { types: ["Item"], filter: e => !e.type || sys.INVENTORY_TYPES.includes(e.type) });
