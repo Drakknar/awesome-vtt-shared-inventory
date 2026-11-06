@@ -38,6 +38,7 @@
     "MenuUnset": "Stop using as the party",
     "MenuOpen": "Open the party's inventory",
     "WindowTitle": "Party inventory",
-    "Edit": "Edit the item"
+    "Edit": "Edit the item",
+    "TransformedParty": "The party actor {name} is a transformed form: reverting it deletes it with the party's inventory. It is no longer used as the party. Choose the original actor ({original}) or another one as the party."
   }
 }

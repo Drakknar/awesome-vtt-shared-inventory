@@ -56,12 +56,25 @@ export const supported = () => !!store();
  */
 export const partySetting = () => store()?.setting ?? null;
 
+/** The GM was told once this session that the stored party is a transformed form. */
+let warnedTransformed = false;
+
 /**
- * The party actor, or null.
+ * The party actor, or null. A stored party that may no longer be one (SotDL: chosen before 0.3.0, then transformed,
+ * so `revertOriginalForm` would delete it with its inventory) counts as not set; the GM is warned once to choose
+ * again.
  * @returns {Actor|null}
  */
 export function getParty() {
-  return store()?.get() ?? null;
+  const party = store()?.get() ?? null;
+  if ( !party || canBeParty(party) ) return party;
+  if ( game.user.isGM && !warnedTransformed ) {
+    warnedTransformed = true;
+    const original = game.actors.get(foundry.utils.getProperty(party, "flags.demonlord.originalActor"));
+    const names = { name: party.name, original: original?.name ?? "?" };
+    ui.notifications.warn(game.i18n.format("AVTTSI.TransformedParty", names));
+  }
+  return null;
 }
 
 /**
