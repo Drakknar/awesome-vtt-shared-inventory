@@ -56,20 +56,20 @@ export const supported = () => !!store();
  */
 export const partySetting = () => store()?.setting ?? null;
 
-/** The GM was told once this session that the stored party is a transformed form. */
-let warnedTransformed = false;
+/** Stored parties (ids) the GM was told once this session are transformed forms. */
+const warnedTransformed = new Set();
 
 /**
- * The party actor, or null. A stored party that may no longer be one (SotDL: chosen before 0.3.0, then transformed,
- * so `revertOriginalForm` would delete it with its inventory) counts as not set; the GM is warned once to choose
- * again.
+ * The party actor, or null. A stored party that can't be one counts as not set. SotDL: a transformed form chosen as
+ * the party before 0.3.0 (`revertOriginalForm` would delete it with its inventory); the GM is warned once per such
+ * party to choose again.
  * @returns {Actor|null}
  */
 export function getParty() {
   const party = store()?.get() ?? null;
   if ( !party || canBeParty(party) ) return party;
-  if ( game.user.isGM && !warnedTransformed ) {
-    warnedTransformed = true;
+  if ( game.user.isGM && sys.isTransformed?.(party) && !warnedTransformed.has(party.id) ) {
+    warnedTransformed.add(party.id);
     const original = game.actors.get(sys.originalId(party));
     const names = { name: party.name, original: original?.name ?? "?" };
     ui.notifications.warn(game.i18n.format("AVTTSI.TransformedParty", names));
@@ -97,7 +97,7 @@ const canSee = party => !!party?.testUserPermission(game.user, "OBSERVER");
  * @param {Actor|null} actor
  * @returns {boolean}
  */
-const canBeParty = actor => !!actor && (actor.type !== "character") && !sys.isTransformed(actor);
+const canBeParty = actor => !!actor && (actor.type !== "character") && !sys.isTransformed?.(actor);
 
 /**
  * The party, if this user may change it.
