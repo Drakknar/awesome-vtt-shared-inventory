@@ -70,7 +70,7 @@ export function getParty() {
   if ( !party || canBeParty(party) ) return party;
   if ( game.user.isGM && !warnedTransformed ) {
     warnedTransformed = true;
-    const original = game.actors.get(foundry.utils.getProperty(party, "flags.demonlord.originalActor"));
+    const original = game.actors.get(sys.originalId(party));
     const names = { name: party.name, original: original?.name ?? "?" };
     ui.notifications.warn(game.i18n.format("AVTTSI.TransformedParty", names));
   }
@@ -92,13 +92,12 @@ export const canEdit = party => !!party?.isOwner;
 const canSee = party => !!party?.testUserPermission(game.user, "OBSERVER");
 
 /**
- * SotDL: may this actor be made the party? Not a player character, and not a transformed form (demonlord 6.1.13
- * `flags.demonlord.isTransformed`): that actor is temporary, `revertOriginalForm` deletes it with its inventory.
+ * SotDL: may this actor be made the party? Not a player character, and not a transformed form (demonlord 6.1.13, the
+ * core's `isTransformed`): that actor is temporary, `revertOriginalForm` deletes it with its inventory.
  * @param {Actor|null} actor
  * @returns {boolean}
  */
-const canBeParty = actor => !!actor && (actor.type !== "character")
-  && !foundry.utils.getProperty(actor, "flags.demonlord.isTransformed");
+const canBeParty = actor => !!actor && (actor.type !== "character") && !sys.isTransformed(actor);
 
 /**
  * The party, if this user may change it.

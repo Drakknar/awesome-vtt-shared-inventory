@@ -41,7 +41,7 @@
         "manifest": "https://github.com/Drakknar/awesome-vtt-core/releases/latest/download/module.json",
         "reason": "Shared code (system adapters, item descriptions, UI helpers).",
         "compatibility": {
-          "minimum": "0.16.0"
+          "minimum": "0.17.0"
         }
       }
     ]
