@@ -56,12 +56,25 @@ export const supported = () => !!store();
  */
 export const partySetting = () => store()?.setting ?? null;
 
+/** Stored parties (ids) the GM was told once this session are transformed forms. */
+const warnedTransformed = new Set();
+
 /**
- * The party actor, or null.
+ * The party actor, or null. A stored party that can't be one counts as not set. SotDL: a transformed form chosen as
+ * the party before 0.3.0 (`revertOriginalForm` would delete it with its inventory); the GM is warned once per such
+ * party to choose again.
  * @returns {Actor|null}
  */
 export function getParty() {
-  return store()?.get() ?? null;
+  const party = store()?.get() ?? null;
+  if ( !party || canBeParty(party) ) return party;
+  if ( game.user.isGM && sys.isTransformed?.(party) && !warnedTransformed.has(party.id) ) {
+    warnedTransformed.add(party.id);
+    const original = game.actors.get(sys.originalId(party));
+    const names = { name: party.name, original: original?.name ?? "?" };
+    ui.notifications.warn(game.i18n.format("AVTTSI.TransformedParty", names));
+  }
+  return null;
 }
 
 /**
@@ -77,6 +90,14 @@ export const canEdit = party => !!party?.isOwner;
  * @returns {boolean}
  */
 const canSee = party => !!party?.testUserPermission(game.user, "OBSERVER");
+
+/**
+ * SotDL: may this actor be made the party? Not a player character, and not a transformed form (demonlord 6.1.13, the
+ * core's `isTransformed`): that actor is temporary, `revertOriginalForm` deletes it with its inventory.
+ * @param {Actor|null} actor
+ * @returns {boolean}
+ */
+const canBeParty = actor => !!actor && (actor.type !== "character") && !sys.isTransformed?.(actor);
 
 /**
  * The party, if this user may change it.
@@ -103,7 +124,7 @@ export function partyContext(actor, state) {
   if ( !party ) {
     // SotDL: the GM can also make an existing actor (not a player character) the party.
     if ( game.user.isGM && store()?.canChoose ) {
-      context.choices = game.actors.filter(a => a.type !== "character").sort(byName).map(a => ({ id: a.id, name: a.name }));
+      context.choices = game.actors.filter(canBeParty).sort(byName).map(a => ({ id: a.id, name: a.name }));
     }
     return context;
   }
@@ -156,7 +177,7 @@ export async function createParty() {
  */
 export function chooseParty(actorId) {
   const actor = game.actors.get(actorId);
-  if ( !game.user.isGM || !actor || !store()?.canChoose ) return null;
+  if ( !game.user.isGM || !canBeParty(actor) || !store()?.canChoose ) return null;
   return store().remember(actor);
 }
 
@@ -187,7 +208,7 @@ export function addActorContextOptions(app, options, openWindow) {
     group: "system",
     visible: li => {
       const actor = actorOf(li);
-      return game.user.isGM && !!actor && (actor.type !== "character") && (actor !== getParty());
+      return game.user.isGM && canBeParty(actor) && (actor !== getParty());
     },
     onClick: (_, li) => chooseParty(li.dataset.entryId)
   }, {

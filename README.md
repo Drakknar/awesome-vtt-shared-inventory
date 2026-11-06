@@ -13,7 +13,7 @@ In dnd5e, coins and items are kept on dnd5e's **primary party**: a *group* actor
 Players need **Owner** permission on the party to change it. With less, the panel is read-only (Observer) or says that the inventory isn't shared; the GM sees a **Let all players change it** button there.
 
 **From the Actors sidebar (GM):** right-click an actor.
-- Shadow of the Demon Lord: **Use as the party's shared inventory** on any non-character actor, and **Stop using as the party** on the current one.
+- Shadow of the Demon Lord: **Use as the party's shared inventory** on any non-character actor (not a creature form a character is transformed into), and **Stop using as the party** on the current one.
 - dnd5e: use dnd5e's own **Set as primary party** on a group actor.
 - Both: **Open the party's inventory** on the party: the same panel in a window (add, search, drag items in, quantities, coins, remove), plus an **Edit** button per item that opens its sheet. **Let all players change it** on the party, while players aren't all Owners.
 - SotDL's own creature sheet hides its Inventory tab unless the system setting **Add Inventory tab to the creature/vehicle sheets** is on.
