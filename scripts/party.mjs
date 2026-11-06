@@ -79,6 +79,15 @@ export const canEdit = party => !!party?.isOwner;
 const canSee = party => !!party?.testUserPermission(game.user, "OBSERVER");
 
 /**
+ * SotDL: may this actor be made the party? Not a player character, and not a transformed form (demonlord 6.1.13
+ * `flags.demonlord.isTransformed`): that actor is temporary, `revertOriginalForm` deletes it with its inventory.
+ * @param {Actor|null} actor
+ * @returns {boolean}
+ */
+const canBeParty = actor => !!actor && (actor.type !== "character")
+  && !foundry.utils.getProperty(actor, "flags.demonlord.isTransformed");
+
+/**
  * The party, if this user may change it.
  * @returns {Actor|null}
  */
@@ -103,7 +112,7 @@ export function partyContext(actor, state) {
   if ( !party ) {
     // SotDL: the GM can also make an existing actor (not a player character) the party.
     if ( game.user.isGM && store()?.canChoose ) {
-      context.choices = game.actors.filter(a => a.type !== "character").sort(byName).map(a => ({ id: a.id, name: a.name }));
+      context.choices = game.actors.filter(canBeParty).sort(byName).map(a => ({ id: a.id, name: a.name }));
     }
     return context;
   }
@@ -156,7 +165,7 @@ export async function createParty() {
  */
 export function chooseParty(actorId) {
   const actor = game.actors.get(actorId);
-  if ( !game.user.isGM || !actor || !store()?.canChoose ) return null;
+  if ( !game.user.isGM || !canBeParty(actor) || !store()?.canChoose ) return null;
   return store().remember(actor);
 }
 
@@ -187,7 +196,7 @@ export function addActorContextOptions(app, options, openWindow) {
     group: "system",
     visible: li => {
       const actor = actorOf(li);
-      return game.user.isGM && !!actor && (actor.type !== "character") && (actor !== getParty());
+      return game.user.isGM && canBeParty(actor) && (actor !== getParty());
     },
     onClick: (_, li) => chooseParty(li.dataset.entryId)
   }, {
