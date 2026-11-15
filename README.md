@@ -1,5 +1,7 @@
 # Awesome VTT – Shared Inventory
 
+<img src="assets/icon.svg" alt="" width="96" align="right">
+
 The party's shared inventory for [Awesome VTT](../awesome-vtt) (table mode) and [Awesome VTT – Phone Companion](../awesome-vtt-mobile). When this module is active, both add a **Party** section: a panel in each table seat, and a tab on the phone.
 
 - **Targets:** Foundry VTT v14 with dnd5e 6.0.x (built against 6.0.5) or Shadow of the Demon Lord (demonlord 6.1.x). Requires [`awesome-vtt-core`](../awesome-vtt-core).
